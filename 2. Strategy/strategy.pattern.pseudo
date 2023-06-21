@@ -1,0 +1,54 @@
+# Applicability
+- Use defferent variants of an algorithm within an object & able to switch to another during runtime
+- Having multiple Class that are similar and only differ in the way they exercute some behavior
+- For isolate the business logic from other details that may not be as important in the context of logic
+- When class has a massive conditional statement that switch from different variants of the same algorithm
+# 
+
+interface Strategy
+    function execute(a,b) {}
+    
+class ConcreteStrategyAdd  implement Strategy do
+    function execute(a,b) do
+        return a+b
+    end
+end
+
+class ConcreteStrategySubtract implement Strategy do
+    function execute(a,b) do
+        return a-b
+    end
+end
+
+class ConcreteStrategyMultiply implement Strategy do
+    function execute(a,b) do
+        return a*b
+    end
+end
+
+// The context defines the interface of interest to clients.
+class StrategyContext do
+    private strategy: Strategy
+
+    function setStrategy(strategy: Strategy) do
+        this.strategy = strategy
+    end
+
+    function executeStrategy(int a, int b) do
+        this.strategy.execute(a,b)
+    end
+end
+
+//Implement in specfic issues
+function sampleImplementation(action) do
+    strategyContext = new StrategyContext()
+    if(action===addition) do
+        strategyContext.setStrategy(new ConcreteStrategyAdd())
+    end else if (action===subtract) do
+        strategyContext.setStrategy(new ConcreteStrategySubtract())
+    end else if (action===multiply) do
+        strategyContext.setStrategy(new ConcreteStrategyMultiply())
+    end
+    result = strategyContext.executeStrategy()
+end
+
