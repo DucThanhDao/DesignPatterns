@@ -1,0 +1,55 @@
+# Applicability
+- Use the Facade pattern when you need to have a limited but straightforward interface to a complex subsystem.
+- Use the Facade when you want to structure a subsystem into layers.
+#
+
+class VideoCall do
+    private fee: Number
+    function createCall(accessToken, privateToken) do
+        // Logic Gen new call here
+    end
+end
+
+class Banking do
+    function doPayment(account, fee) do
+        //logic Do payment here
+    end
+    function checkValidAccount(account) do
+        // logic check Account here
+    end
+end
+
+class Discount do
+    function calcDiscount(percent) do
+        //logic calculation discount here
+    end
+end
+
+class UserActions do
+    constructor(user){
+        this.videoCall = new VideoCall()
+        this.banking = new Banking()
+        this.discount = new Discount()
+        this.user = user
+    }
+    function generateVideoCall do
+        generalPrice = this.videoCall.fee;
+        discountedPrice = this.discount.calcDiscount(generalPrice);
+        isValidUser = this.banking.checkValidAccount(user.account);
+        if(isValidUser) {
+            this.banking.doPayment(user.account, discountedPrice);
+            this.videoCall.createCall(user.accessToken, user.privateToken)
+        }
+    end
+end
+
+function createCall(user) do
+    const action = new UserActions();
+    action.generateVideoCall(user)
+end
+
+createCall({
+    account: 1,
+    accessToken: 1
+    privateToken: 1
+})
