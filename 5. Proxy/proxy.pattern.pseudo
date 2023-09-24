@@ -1,0 +1,85 @@
+# Applicability
+- Lazy initialization (virtual proxy). This is when you have a heavyweight service object that wastes system resources 
+by being always up, even though you only need it from time to time.
+-  Access control (protection proxy). This is when you want only specific clients to be able to use the service object; 
+for instance, when your objects are crucial parts of an operating system and clients are various launched applications (including malicious ones).
+- Local execution of a remote service (remote proxy). This is when the service object is located on a remote server.
+- Logging requests (logging proxy). This is when you want to keep a history of requests to the service object.
+- Caching request results (caching proxy). This is when you need to cache results of client requests and manage the 
+life cycle of this cache, especially if results are quite large.
+- Smart reference. This is when you need to be able to dismiss a heavyweight object once there are no clients that use it.
+#
+
+// The interface of remote service
+interface ThirdPartyYoutubeLib
+    function listVideos()
+    function getVideoInfor()
+    function downloadVideo()
+// Real third-party service
+class ThirdPartyYoutubeClass implement ThirdPartyYoutubeLib do
+    function listVideos() do
+        //Logic list video here
+    end
+
+    function getVideoInfor() do
+        // Logic get Video Infor here
+    end
+
+    function downloadVideo() do
+        // Logic download video here
+    end
+end
+//Proxy for third-party service
+class ThirdPartyYoutubeProxyClass implement ThirdPartyYoutubeLib do
+    private field service: ThirdPartyYoutubeLib,
+    private field listCache, videoCache, videoDownloadedCache
+    field needReset
+    constructor ThirdPartyYoutubeProxyClass(service: ThirdPartyYoutubeLib) {
+        this.service = service;
+    }
+    function listVideos() do
+        if(!listCache || needReset){
+            listCache = this.service.listVideos()
+        }
+        return listCache
+    end
+    function getVideoInfor() do
+        if(!videoCache || needReset){
+            videoCache = this.service.getVideoInfor()
+        }
+        return videoCache
+    end
+    function downloadVideo() do
+        if(!videoDownloadedCache || needReset){
+            videoDownloadedCache = this.service.downloadVideo()
+        }
+        return videoDownloadedCache
+    end 
+end
+
+class YoutubeManager do
+    private field service: ThirdPartyYoutubeLib
+    constructor YoutubeManager(service: ThirdPartyYoutubeLib) {
+        this.service = service
+    }
+    function renderListPanel(id) do
+        this.service.listVideos()
+
+    function renderVideoPage(id) do
+        this.service.getVideoInfor(id)
+    end
+
+    function reactOnUserInput() do
+        this.renderVideoPage()
+        this.renderListPanel()
+    end
+end
+
+class Application do
+    function init do
+        youtubeService = new ThirdPartyYoutubeClass();
+        youtubeProxyService = new ThirdPartyYoutubeProxyClass(youtubeService)
+        manager = new youtubeProxyService()
+        manager.reactOnUserInput()
+    end
+end
